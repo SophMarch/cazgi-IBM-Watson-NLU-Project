@@ -20,6 +20,8 @@ function getNLUInstance() {
     return naturalLanguageUnderstanding;
 }
 
+const naturalLanguageUnderstanding = getNLUInstance();
+
 app.use(express.static('client'))
 
 const cors_app = require('cors');
@@ -30,20 +32,77 @@ app.get("/",(req,res)=>{
   });
 
 app.get("/url/emotion", (req,res) => {
-
-    return res.send({"happy":"90","sad":"10"});
+    getNLUInstance();
+    const analyzeParams = {
+        'url': req.query.url,
+        'features': {
+            'emotion': {}
+        }
+    };
+    naturalLanguageUnderstanding.analyze(analyzeParams)
+    .then(analysisResults => {
+        const emotion = analysisResults.result.emotion.document.emotion;
+        return res.send(emotion);
+    })
+    .catch(err => {
+        console.log('error:', err);
+    });
 });
 
 app.get("/url/sentiment", (req,res) => {
-    return res.send("url sentiment for "+req.query.url);
+    getNLUInstance();
+    const analyzeParams = {
+        'text': req.query.url,
+        'features': {
+            'sentiment': {}
+        }
+    };
+    naturalLanguageUnderstanding.analyze(analyzeParams)
+    .then(analysisResults => {
+        console.log(JSON.stringify(analysisResults, null, 2));
+        const emotion = analysisResults.result.sentiment.document.label;
+        return res.send(emotion);
+    })
+    .catch(err => {
+        console.log('error:', err);
+    });
 });
 
 app.get("/text/emotion", (req,res) => {
-    return res.send({"happy":"10","sad":"90"});
+    getNLUInstance();
+    const analyzeParams = {
+        'text': req.query.text,
+        'features': {
+            'emotion': {}
+        }
+    };
+    naturalLanguageUnderstanding.analyze(analyzeParams)
+    .then(analysisResults => {
+        const emotion = analysisResults.result.emotion.document.emotion;
+        return res.send(emotion);
+    })
+    .catch(err => {
+        console.log('error:', err);
+    });
 });
 
 app.get("/text/sentiment", (req,res) => {
-    return res.send("text sentiment for "+req.query.text);
+    getNLUInstance();
+    const analyzeParams = {
+        'text': req.query.text,
+        'features': {
+            'sentiment': {}
+        }
+    };
+    naturalLanguageUnderstanding.analyze(analyzeParams)
+    .then(analysisResults => {
+        console.log(JSON.stringify(analysisResults, null, 2));
+        const emotion = analysisResults.result.sentiment.document.label;
+        return res.send(emotion);
+    })
+    .catch(err => {
+        console.log('error:', err);
+    });
 });
 
 let server = app.listen(8080, () => {
